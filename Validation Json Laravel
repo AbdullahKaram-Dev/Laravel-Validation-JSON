@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Requests\Web\Admin;
+
+use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Sector;
+
+class StoreSectorRequest extends FormRequest
+{
+    public function authorize()
+    {
+        return true;
+    }
+
+
+    public function rules()
+    {
+        return [
+            'sector_name.en'     => ['required','string','min:3','max:15',
+            function ($attribute,$value,$fail)
+            {
+                if(Sector::whereRaw("JSON_VALUE(sectors.sector_name, '$.en') = ?",$value)->count() != 0)
+                {
+                    $fail("sector name english must be unique.");
+                }
+            }
+            ],
+            'sector_name.ar'      => ['required','string','min:3','max:15',
+             function ($attribute, $value, $fail)
+             {
+                if (Sector::whereRaw("JSON_VALUE(sectors.sector_name, '$.ar')  = ?",$value)->count() != 0) {
+                    $fail('sector name arabic must be unique.');
+                }
+             }
+            ]
+        ];
+    }
+}
